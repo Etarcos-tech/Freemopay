@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:freemopay/screen/dashboard/dashboard.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
@@ -12,12 +13,28 @@ class SignIn extends StatefulWidget{
 
 
 class SignInState extends State<SignIn>{
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  final GlobalKey<FormFieldState<String>> _phoneNumberKey =
-  GlobalKey<FormFieldState<String>>();
-  
-  String phoneNumber = '';
-  String password = '';
+
+  final RegExp emailRegexp = RegExp(
+      r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+"
+  );
+
+  var _formKey = GlobalKey<FormState>();
+  var isLoading = false;
+
+  void _submit() {
+    final isValid = _formKey.currentState?.validate();
+    if (isValid!) {
+      Navigator.push( context,
+        PageRouteBuilder(
+          pageBuilder: (_, __, ___) => Dashbord(),
+          transitionDuration: Duration(seconds: 1),
+          transitionsBuilder: (_, a, __, c) => FadeTransition(opacity: a, child: c),
+        ),
+      );
+    }
+    _formKey.currentState?.save();
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +64,7 @@ class SignInState extends State<SignIn>{
                 ],
               ),
             ),
-            SizedBox(height: 40,),
+            SizedBox(height: 35,),
             Container(
               width: MediaQuery.of(context).size.width*.5,
               height: 65,
@@ -59,7 +76,7 @@ class SignInState extends State<SignIn>{
                 fit: BoxFit.cover,
               ),
             ),
-            SizedBox(height: 40,),
+            SizedBox(height: 30,),
             Column(
               children: [
                 Text(
@@ -79,8 +96,9 @@ class SignInState extends State<SignIn>{
                 ),
               ],
             ),
-            SizedBox(height: 40,),
+            SizedBox(height: 25,),
             Form(
+              key: _formKey,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -96,18 +114,27 @@ class SignInState extends State<SignIn>{
                     inputDecoration: InputDecoration(
                       border: OutlineInputBorder()
                     ),
-                    key: _phoneNumberKey,
                     onInputChanged: (PhoneNumber number){
                       print(number.phoneNumber);
                     },
                     onInputValidated: (bool value){
                       print(value);
                     },
+                    onFieldSubmitted: (value){
+
+                    },
+                    validator: (value){
+                      if(value!.isEmpty){
+                        return 'Entrer un numero valide';
+                      }
+                        return null;
+                      },
+
                     selectorConfig: SelectorConfig(
                       selectorType: PhoneInputSelectorType.BOTTOM_SHEET,
                     ),
                   ),
-                  SizedBox(height: 15,),
+                  SizedBox(height: 10,),
                   Text(
                     'Password',
                     style: TextStyle(
@@ -121,8 +148,17 @@ class SignInState extends State<SignIn>{
                         border: OutlineInputBorder(),
                         labelText: 'Enter your password'
                     ),
+                    onFieldSubmitted: (value){
+
+                    },
+                    validator: (value){
+                      if(value!.isEmpty){
+                        return 'Entrer un numero valide';
+                      }
+                      return null;
+                    },
                   ),
-                  SizedBox(height: 15,),
+                  SizedBox(height: 10,),
                   Text(
                     ' Confirm Password',
                     style: TextStyle(
@@ -136,11 +172,20 @@ class SignInState extends State<SignIn>{
                         border: OutlineInputBorder(),
                         labelText: 'Confirm your password',
                     ),
+                    onFieldSubmitted: (value){
+
+                    },
+                    validator: (value){
+                      if(value!.isEmpty){
+                        return 'Entrer un numero valide';
+                      }
+                      return null;
+                    },
                   )
                 ],
               ),
             ),
-            SizedBox(height: 20,),
+            SizedBox(height: 15,),
             Container(
               width: MediaQuery.of(context).size.width * 9,
               decoration: BoxDecoration(
@@ -149,11 +194,7 @@ class SignInState extends State<SignIn>{
               ),
               child: TextButton(
                 onPressed: (){
-                  Navigator.of(context).push(
-                      (MaterialPageRoute<Dashbord>(builder: (context){
-                        return Dashbord();
-                      }))
-                  );
+                  _submit();
                 },
                 child: Text(
                   'S\'inscrire',
